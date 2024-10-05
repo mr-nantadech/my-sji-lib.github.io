@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #333;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        ul li {
+            padding: 5px 0;
+            font-size: 14px;
+            color: #007BFF;
+        }
+
+        ul li a {
+            text-decoration: none;
+        }
+
+        ul li a:hover {
+            text-decoration: underline;
+            color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div>
+        <span>
+            <input type="search" id="uid">
+        </span>
+    </div>
+    <br>
+    <div>
+        <span>
+            <code>$(<i>viewbag-of-allUserData</i>).getWhoApproverOf("<span id="thisUid"></span>").</code> 
+            <input type="checkbox" id="checkMail" value="1" checked>
+            <label for="checkMail">email_in()</label>
+            <input type="checkbox" id="checkProfile" value="1">
+            <label for="checkProfile">profiles()</label>
+            <input type="checkbox" id="checkBasicProfile" value="1">
+            <label for="checkBasicProfile">basic_profiles()</label>
+        </span>
+    </div>
+
+    <div id="showResulltM"></div>
+    <br>
+    <div id="showResullt"></div>
+    <br>
+    <div id="showResulltBP"></div>
+
+</body>
+
+<script src="jquery-3.7.1.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script> -->
+
+<!-- <script src="https://raw.githack.com/mr-nantadech/my-sji/develop/my-sji-lib.js"></script> -->
+
+<!-- <script src="https://cdn.statically.io/gh/mr-nantadech/my-sji/ph1/my-sji-lib.js"></script> -->
+
+<!-- <script src="https://cdn.jsdelivr.net/gh/mr-nantadech/my-sji@1.0.5/my-sji-lib.min.js"></script> -->
+
+<script src="my-sji-lib.js"></script>
+
+
+<script>
+
+    $(document).ready(async function () {
+
+        console.log("ready!");
+
+        async function loadData() {
+            try {
+                const response = await $.getJSON("alldata.json");
+                return response.data_model;
+            } catch (error) {
+                console.error("Request Failed: ", error);
+                return null;
+            }
+        }
+
+        var allUserData = await loadData();
+
+        $('#uid').on('input change', function (e) {
+            if (allUserData) {
+                var userId = $(this).val();
+
+                $('#thisUid').html(userId)
+
+                var approverProfile = $(allUserData).getWhoApproverOf(userId).profiles();
+                var approverEmail = $(allUserData).getWhoApproverOf(userId).email_in();
+                var approverBasicProfile = $(allUserData).getWhoApproverOf(userId).basic_profiles();
+
+
+                if ($('#checkProfile').is(':checked')) {
+                    $('#showResullt').html('<pre>' + JSON.stringify(approverProfile, null, 4) + '</pre>');
+                } else {
+                    $('#showResullt').empty();
+                }
+
+                if ($('#checkMail').is(':checked')) {
+                    $('#showResulltM').html('<pre>' + JSON.stringify(approverEmail, null, 4) + '</pre>');
+                } else {
+                    $('#showResulltM').empty();
+                }
+
+                if ($('#checkBasicProfile').is(':checked')) {
+                    $('#showResulltBP').html('<pre>' + JSON.stringify(approverBasicProfile, null, 4) + '</pre>');
+                } else {
+                    $('#showResulltBP').empty();
+                }
+            }
+        });
+
+        $('#checkProfile, #checkMail,#checkBasicProfile').on('change', function () {
+            $('#uid').trigger('input');
+        });
+
+    });
+
+</script>
+
+</html>
